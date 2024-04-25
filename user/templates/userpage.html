@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User</title>
+    <style>
+        #userList li {
+            cursor: pointer;
+            padding: 5px;
+            margin: 5px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    {% if not success %}
+    <p style="color: red;">{{ message }}</p>
+    {% endif %}
+    Name: {{ data.first_name }} {{ data.last_name }}
+    <h2>All Users</h2>
+    <ol id="userList"></ol> 
+</body>
+<script>
+    window.onload = function() {
+        const accessToken = '{{ request.session.access_token }}';
+        console.log(accessToken)
+        fetch('/chats/user/', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const userList = document.getElementById('userList');
+                data.data.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = `${user.full_name} - ${user.email}`;
+                    li.addEventListener('click', () => {
+                        window.location.href = `/chats/chat-page/${user.id}`;
+                    });
+                    userList.appendChild(li);
+                });
+            } else {
+                console.error(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    };
+</script>
+</html>

@@ -6,7 +6,7 @@ from .serializers import UserSerializer, GetUserDetailsSerializer, LoginUserSeri
 from .models import TblUser
 from rest_framework_simplejwt.tokens import RefreshToken 
 from django.contrib.auth.models import User
-
+from django.shortcuts import render, redirect
 
 class UserView(APIView):
     def post(self, request):
@@ -67,11 +67,27 @@ class UserView(APIView):
             success = True
             message = "Data Fetched"
             response_code = status.HTTP_200_OK
+        
+        print({
+            "success": success,
+            "data": data,
+            "message": message,
+            "response_code": response_code
+        })
 
-        return Response({"success": success, "message": message, "data": data}, status=response_code)
+        # return Response({"success": success, "message": message, "data": data}, status=response_code)
+        return render(request, 'userpage.html', {
+            "success": success,
+            "data": data,
+            "message": message,
+            "response_code": response_code
+        })
 
 
 class LoginView(APIView):
+    def get(self, request):
+        return render(request, 'login.html')
+
     def post(self, request):
         user_login_serializer = LoginUserSerializer(data=request.data)
         if user_login_serializer.is_valid():
@@ -81,7 +97,8 @@ class LoginView(APIView):
             try:
                 user = TblUser.objects.get(email = email, is_active = True)
             except TblUser.DoesNotExist:
-                return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                # return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                return render(request, 'login.html', {'error': 'Invalid credentials'})
             
             if check_password(password, user.password):
                 django_user, created = User.objects.get_or_create(username = user.email)
@@ -89,15 +106,20 @@ class LoginView(APIView):
                     django_user.set_password(password)
                     django_user.save()
                 refresh = RefreshToken.for_user(django_user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'message': "Login Successful"
-                })
+                # return Response({
+                #     'refresh': str(refresh),
+                #     'access': str(refresh.access_token),
+                #     'message': "Login Successful"
+                # })
+                user_id = user.id
+                request.session['access_token'] = str(refresh.access_token)
+                return redirect('user_details', user_id=user_id)
             else: 
-                return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                # return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED) 
+                return render(request, 'login.html', {'error': 'Invalid credentials'})
         
-        return Response(user_login_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return Response(user_login_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return render(request, 'login.html', {'error': user_login_serializer.errors})
                 
 
 

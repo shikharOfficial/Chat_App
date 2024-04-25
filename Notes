@@ -137,3 +137,33 @@ OR
 -> Changes in the Tables in DB:
    -> A user with username and password is created in "auth_user" table.
    -> Refresh Token is saved in "token_blacklist_outstandingtoken"
+   
+   
+3) Check For Authentication:
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+4) Extract User from Request JWT ::: request.user
+   
+   
+......................................................................................................................................................
+
+Serializers :::
+1) serializer.Serializer
+-> With Serializer, you have full control over how data is serialized and deserialized. You define the fields and methods explicitly in the serializer class.
+-> Serializer is useful when you need to customize the serialization or deserialization process extensively, or when you're working with non-model data.
+2) serializer.ModelSerializer
+-> It automatically generates serializer fields based on the model's fields, reducing the amount of boilerplate code you need to write.
+
+ -> Valiadate Function
+     def validate(self, attrs):
+         email = attrs.get('email')
+         password = attrs.get('password')  
+         ..........
+ -> The validate method is a custom validation method provided by Django REST Framework's serializer class. 
+ -> This method is called when you invoke the is_valid() method on the serializer instance, and it allows you to perform additional validation on the input data beyond the field-level validation provided by the serializer's fields.
+ -> attrs ->  (short for "attributes"), which is a dictionary containing the validated data for all the serializer's fields.
+        

@@ -11,6 +11,14 @@
             margin: 5px;
             background-color: #f0f0f0;
             border-radius: 5px;
+        } 
+        #newUserList {
+            margin-top: 1.4rem;
+            cursor: pointer;
+            padding: 5px;
+            margin: 5px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -18,9 +26,15 @@
     {% if not success %}
     <p style="color: red;">{{ message }}</p>
     {% endif %}
-    Name: {{ data.first_name }} {{ data.last_name }}
-    <h2>All Users</h2>
+    Your Name: {{ data.first_name }} {{ data.last_name }}
+    <h2>Users</h2>
     <ol id="userList"></ol> 
+    <br />
+    <br />
+    <br />
+    <br />
+    <h2>New Users</h2>
+    <ol id="newUserList"></ol> 
 </body>
 <script>
     window.onload = function() {
@@ -35,13 +49,22 @@
         .then(data => {
             if (data.success) {
                 const userList = document.getElementById('userList');
-                data.data.forEach(user => {
+                const newUserList = document.getElementById('newUserList');
+                data.data.users_already_messaged.forEach(user => {
                     const li = document.createElement('li');
                     li.textContent = `${user.full_name} - ${user.email}`;
                     li.addEventListener('click', () => {
                         window.location.href = `/chats/chat-page/${user.id}`;
                     });
                     userList.appendChild(li);
+                });
+                data.data.new_users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = `${user.full_name} - ${user.email}`;
+                    li.addEventListener('click', () => {
+                        window.location.href = `/chats/chat-page/${user.id}`;
+                    });
+                    newUserList.appendChild(li);
                 });
             } else {
                 console.error(data.message);

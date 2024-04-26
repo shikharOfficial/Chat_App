@@ -37,34 +37,6 @@
     <button id="sendButton">Send</button>
 
     <script>
-         const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/chat/public_room/'
-        );
-
-        // on socket open
-        chatSocket.onopen = function (e) {
-            console.log('Chat socket successfully connected.');
-        };
-
-        // on socket close
-        chatSocket.onclose = function (e) {
-            console.log('Chat socket closed unexpectedly');
-        };
-
-        // on receiving message on group
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            const message = data.message;
-            
-            setMessage(message);
-        };
-
-        window.onload = function() {
-            fetchChats();
-        };
-
         const accessToken = '{{ request.session.access_token }}';
 
         function parseJwt(token) {
@@ -82,7 +54,38 @@
             }
         }
 
-        const sender_id = parseJwt(accessToken);
+        const sender_id = parseJwt(accessToken).user_id;
+        const recipientId = '{{ recipient_id }}';
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + `/ws/chat/?token=${accessToken}&recipient=${recipientId}`
+        );
+
+        // on socket open
+        chatSocket.onopen = function (e) {
+            console.log('Chat socket successfully connected.');
+        };
+
+        // on socket close
+        chatSocket.onclose = function (e) {
+            console.log('Chat socket closed unexpectedly');
+        };
+
+        // on receiving message on group
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data)
+            const message = data.message;
+            const isSender = data.sender_id === sender_id;
+            
+            setMessage(message, isSender);
+        };
+
+        window.onload = function() {
+            fetchChats();
+        };
 
         function fetchChats() {
             const recipientId = '{{ recipient_id }}' ;
@@ -130,50 +133,25 @@
         function sendMessage() {
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
-            const recipientId = '{{ recipient_id }}';
-
-            // if (message) {
-            //     fetch('/chats/chats-from-user/', {
-            //         method: 'POST',
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //             'Authorization': `Bearer ${accessToken}`,
-            //         },
-            //         body: JSON.stringify({
-            //             recipient: recipientId,
-            //             message: message
-            //         })
-            //     })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.success) {
-            //             setMessage(message)
-            //         } else {
-            //             console.error(data.message);
-            //         }
-            //     })
-            //     .catch(error => console.error('Error:', error));
-                
-            //     messageInput.value = '';
-            // } else {
-            //     console.error('Message cannot be empty');
-            // }
 
             chatSocket.send(JSON.stringify({
                 message,
-                recipientId,
+                recipientId: parseInt(recipientId),
                 senderId: sender_id
             }));
         }
 
-        function setMessage(message) {
+        function setMessage(message, isSender) {
             const chatContainer = document.getElementById('chatContainer');
             const chatBubble = document.createElement('div');
+            const messageInput = document.getElementById('messageInput');
             chatBubble.textContent = message;
-            chatBubble.classList.add('chat-bubble', 'sender');
+            chatBubble.classList.add('chat-bubble', isSender ? 'sender' : 'recipient');
             chatContainer.appendChild(chatBubble);
             
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            messageInput.value = '';
         }
 
     </script>

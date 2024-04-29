@@ -88,7 +88,7 @@ By default, Django uses the app name and the lowercase version of the model's cl
 
 
 2) APIView ::: from rest_framework.views import APIView
--> class ProductView(APIView):
+-> ``` class ProductView(APIView):
 
     serializer_class = ProductSerializer
 
@@ -98,14 +98,15 @@ By default, Django uses the app name and the lowercase version of the model's cl
 
         serializer = self.serializer_class(products, many=True)
 
-        return Response(serializer.data)
+        return Response(serializer.data) ```
 
 3) ViewSets ::: A ViewSet is a class-based view, able to handle all of the basic HTTP requests: GET, POST, PUT, DELETE without hard coding any of the logic.
--> class ProductViewSet(viewsets.ModelViewSet):
+-> ``` class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     http_method_names = ['get', 'post']
+```
     
  -> Viewset uses Routers instead of URLs
     
@@ -121,20 +122,21 @@ APIView vs ViewSets ::: https://dev.to/koladev/apiview-vs-viewsets-4ln0
 
 -> SOLUTION ::
 1) Create User Model that inherits from AbstractBaseUser
-  ->from django.contrib.auth.models import AbstractBaseUser
+  -> ```from django.contrib.auth.models import AbstractBaseUser
     class TblKaayaLogin(AbstractBaseUser): 
     ..........
-    USERNAME_FIELD = id
+    USERNAME_FIELD = id ```
   -> Create CustomTokenObtainPairSerializer to get token and send token as response.
   -> Use this serializer in Login View.
     
 OR
     
 2) Create a django_user as:
-   -> django_user, created = User.objects.get_or_create(username = user.email)
+   -> ``` django_user, created = User.objects.get_or_create(username = user.email)
                 if created:
                     django_user.set_password(password)
                     django_user.save()
+```
                     
 -> Changes in the Tables in DB:
    -> A user with username and password is created in "auth_user" table.
@@ -142,11 +144,12 @@ OR
    
    
 3) Check For Authentication:
-from rest_framework.permissions import IsAuthenticated
+``` from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+```
     
 4) Extract User from Request JWT ::: request.user
    
@@ -162,10 +165,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 -> It automatically generates serializer fields based on the model's fields, reducing the amount of boilerplate code you need to write.
 
  -> Valiadate Function
-     def validate(self, attrs):
+     ``` def validate(self, attrs):
          email = attrs.get('email')
          password = attrs.get('password')  
          ..........
+         ```
  -> The validate method is a custom validation method provided by Django REST Framework's serializer class. 
  -> This method is called when you invoke the is_valid() method on the serializer instance, and it allows you to perform additional validation on the input data beyond the field-level validation provided by the serializer's fields.
  -> attrs ->  (short for "attributes"), which is a dictionary containing the validated data for all the serializer's fields.
@@ -173,16 +177,18 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 3) data vs instance 
 ## -> data ::: When you use data, you're providing data (typically a dictionary) that you want to serialize into a specific format defined by the serializer.
 
-data_to_serialize = {'field1': 'value1', 'field2': 'value2', 'field3': 'value3'}
+``` data_to_serialize = {'field1': 'value1', 'field2': 'value2', 'field3': 'value3'}
 serializer_with_data = MyModelSerializer(data=data_to_serialize)
 serializer_with_data.is_valid()  # Validate the data
 serialized_data = serializer_with_data.validated_data  # Get validated data
+```
 
 ## -> instance ::: When you use instance, you're providing an instance of a Django model or queryset that you want to serialize into a specific format.
 
-instance = MyModel.objects.get(pk=1)  # Retrieve instance from database
+``` instance = MyModel.objects.get(pk=1)  # Retrieve instance from database
 serializer_with_instance = MyModelSerializer(instance=instance)
 serialized_data = serializer_with_instance.data  # Get serialized data
+``` 
 
 .................................................................................................................................
 
@@ -210,81 +216,83 @@ serialized_data = serializer_with_instance.data  # Get serialized data
 
 # ORM (Object Relational Queries) Queries :::
 
-1) GET -> Model.objects.get(pk=1)
-2) Filter ->  Model.objects.filter(userId=3)
-3) Filter + Values -> ModelA.objects.filter(sender_id=user_id).values("recipient", "id") -> recipient and id are the fields inside ModelA
-4) Filter + Values + Referencing -> ModelA.objects.filter(sender_id=user_id).values("recipient__id", "recipient__first_name") -> first_name and id are the fields that are present in ModelB that ModelA is referencing
+1) GET -> ``` Model.objects.get(pk=1) ```
+2) Filter -> ``` Model.objects.filter(userId=3) ```
+3) Filter + Values -> ``` ModelA.objects.filter(sender_id=user_id).values("recipient", "id") ``` -> recipient and id are the fields inside ModelA
+4) Filter + Values + Referencing -> ``` ModelA.objects.filter(sender_id=user_id).values("recipient__id", "recipient__first_name") ``` -> first_name and id are the fields that are present in ModelB that ModelA is referencing
 5) __  ---> This notation is used to traverse relationships between models in Django's ORM queries.
-6) Create -> Model.objects.create(name='Shikhar', age=24)
-7) Greater Than -> Book.objects.filter(published_date__gt=date(2023, 1, 1))
-8) Exclude + IN -> Model.objects.exclude(id=userId).exclude(id__in=AnyList)
-9) Filter + Q + Order By -> Chats.objects.filter(Q(sender_id=sender, recipient_id=receiver) | Q(sender_id=receiver, recipient_id=sender)).order_by("sent_at")
+6) Create -> ``` Model.objects.create(name='Shikhar', age=24) ```
+7) Greater Than -> ``` Book.objects.filter(published_date__gt=date(2023, 1, 1)) ```
+8) Exclude + IN -> ``` Model.objects.exclude(id=userId).exclude(id__in=AnyList) ```
+9) Filter + Q + Order By -> ``` Chats.objects.filter(Q(sender_id=sender, recipient_id=receiver) | Q(sender_id=receiver, recipient_id=sender)).order_by("sent_at") ```
 10) Q -> The Q object in Django allows for complex queries using logical operators like & (AND), | (OR), and ~ (NOT).
-11) Range > Model.objects.filter(Q(price__range=(40,100)))
+11) Range > ``` Model.objects.filter(Q(price__range=(40,100))) ```
 
 ## Examples :::
 
 1) Retrieve articles that are either written by the author "John" or published in 2022
-articles = Article.objects.filter(Q(author="John") | Q(published_year=2022))
+``` articles = Article.objects.filter(Q(author="John") | Q(published_year=2022)) ```
 
 2) ### Retrieve users who are either active or have premium membership
-users = User.objects.filter(Q(is_active=True) | Q(has_premium_membership=True))
+``` users = User.objects.filter(Q(is_active=True) | Q(has_premium_membership=True)) ``` 
 
 3) ### Retrieve products with a price greater than $100 and in the "Electronics" category
-products = Product.objects.filter(Q(price__gt=100) & Q(category="Electronics"))
+``` products = Product.objects.filter(Q(price__gt=100) & Q(category="Electronics")) ```
 
 4) ### Retrieve articles that are not published in the year 2021
-articles = Article.objects.filter(~Q(published_year=2021))
+``` articles = Article.objects.filter(~Q(published_year=2021)) ```
 
 5) ### Retrieve users with names starting with 'J' or 'S'
-users = User.objects.filter(Q(name__startswith='J') | Q(name__startswith='S'))
+``` users = User.objects.filter(Q(name__startswith='J') | Q(name__startswith='S')) ```
 
 6) ### Retrieve products with prices between $50 and $100 or with a discount
-products = Product.objects.filter(Q(price__range=(50, 100)) | Q(discount__isnull=False))
+``` products = Product.objects.filter(Q(price__range=(50, 100)) | Q(discount__isnull=False)) ```
 
 7) ### Retrieve articles with titles containing "Django" or "Python" and published by "John"
-articles = Article.objects.filter(Q(title__icontains="Django") | Q(title__icontains="Python"), author="John")
+``` articles = Article.objects.filter(Q(title__icontains="Django") | Q(title__icontains="Python"), author="John") ```
 
 8) ### Retrieve orders containing products with prices less than $50 or quantities greater than 10
-orders = Order.objects.filter(Q(products__price__lt=50) | Q(products__quantity__gt=10))
+``` orders = Order.objects.filter(Q(products__price__lt=50) | Q(products__quantity__gt=10)) ```
 
 ...........................................................................................................................
 
 # Web Sockets :::
 
-1) self.scope['query_string'].decode('utf8')
+1) ``` self.scope['query_string'].decode('utf8') ```
 -> self.scope['query_string'] results in 'query_string': b'token:.........'
 -> This is byte format and hence needs to be converted to string. Hence use decode('utf8')
 
 2) Query Dict :::
--> query_string = b'token=eyJhbGciOiJ......8gJRpIpY&recipient=2'
+-> ``` query_string = b'token=eyJhbGciOiJ......8gJRpIpY&recipient=2'
 query_dict = QueryDict(query_string.decode('utf-8'))
 token = query_dict.get('token')
-recipient = query_dict.get('recipient')
+recipient = query_dict.get('recipient') ```
 
 3) ## Setup :::
 
-i) chat_app/settings.py -> ASGI_APPLICATION = 'chat_app.asgi.application'
+i) chat_app/settings.py -> ```  ASGI_APPLICATION = 'chat_app.asgi.application' ```
 ii) Define application variable : 
-   application = ProtocolTypeRouter({
+  ``` application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AllowedHostsOriginValidator(
             URLRouter(
                 websocket_urlpatterns
             )
         ),
-})
+}) ```
 
 websocket_urlpatterns -> routing of websocket
 
 iii) routing file :
-websocket_urlpatterns = [
+``` websocket_urlpatterns = [
     re_path(r"ws/chat/", consumers.ChatConsumer.as_asgi()),
 ]
+```
 
 iv) Consumer.py file :
 
-a) class ChatConsumer(WebsocketConsumer):
+a)
+``` class ChatConsumer(WebsocketConsumer):
         def connect(self):
         """Get the Access token / Recipient ID / User Id from Query String, generate a room and accept the connection"""
 
@@ -315,3 +323,4 @@ a) class ChatConsumer(WebsocketConsumer):
         """ This is called twice for a single message (sent from Frontend). After receiving the message, this function is called """
 
         self.send(text_data=json.dumps({"message": message }))
+```

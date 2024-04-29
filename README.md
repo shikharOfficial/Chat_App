@@ -71,16 +71,18 @@ By default, Django uses the app name and the lowercase version of the model's cl
 
 -> ListAPIView : It is used for listing multiple instances of a model.
 # Get all users                
-class UserListView(ListAPIView):
+```class UserListView(ListAPIView):
     queryset = TblUser.objects.all()
     serializer_class = UserSerializer
+```
     
 -> RetrieveAPIView : It is used for retrieving a single instance of a model by its primary key or another unique identifier.
 # Get individual user
-class UserDetailView(RetrieveAPIView):
+``` class UserDetailView(RetrieveAPIView):
     queryset = TblUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'id'
+```
 
 -> RetrieveUpdateDestroyAPIView
 

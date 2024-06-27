@@ -1,60 +1,62 @@
 # Python Inheritance:
-1) Single Inheritance
-   -> class Subclass(BaseClass):
-2) Multiple 
-   -> class Subclass(BaseClass1, BaseClass2, ...):
-3) Multilevel
-   -> class Subclass1(BaseClass1): and class Subclass2(Subclass1):
-4) Hierarchical
-   -> class Subclass1(BaseClass): and class Subclass2(BaseClass):
+1. Single Inheritance
+   - class Subclass(BaseClass):
+2. Multiple 
+   - class Subclass(BaseClass1, BaseClass2, ...):
+3. Multilevel
+   - class Subclass1(BaseClass1): and class Subclass2(Subclass1):
+4. Hierarchical
+   - class Subclass1(BaseClass): and class Subclass2(BaseClass):
  
 ..........................................................................................................................................................
 
-# Mysql Installation Fix: sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+# Mysql
+**Installation Fix:**
+`sudo apt-get install python3-dev default-libmysqlclient-dev build-essential`
 
-MYSQL:
-mysql -u root -p
-SHOW DATABASES;
-CREATE DATABASE chat_app;
-USE chat_app;
-SHOW TABLES;
+1. mysql -u root -p
+2. SHOW DATABASES;
+3. CREATE DATABASE chat_app;
+4. USE chat_app;
+5. SHOW TABLES;
 
 
-Check Process Id for a PORT:
-sudo lsof -t -i:6379 -> Outputs Process ID
+- Check Process Id for a PORT:
+`sudo lsof -t -i:6379 -> Outputs Process ID`
 
 ............................................................................................................................................................
 
 # Models:
-1) BigAutoField vs BigIntegerField
--> Use BigAutoField when you need an auto-incrementing primary key field for your model.
--> Use BigIntegerField when you need to store large integer values but don't need auto-incrementing behavior, or when you need to customize how values are assigned to the field.
--> When you define a field in a Django model as BigAutoField, Django automatically treats it as the primary key for the model.
+1. BigAutoField vs BigIntegerField
+- Use BigAutoField when you need an auto-incrementing primary key field for your model.
+- Use BigIntegerField when you need to store large integer values but don't need auto-incrementing behavior, or when you need to customize how values are assigned to the field.
+- When you define a field in a Django model as BigAutoField, Django automatically treats it as the primary key for the model. \
 
-2) auto_now_add vs auto_now
-created_date = models.DateTimeField(auto_now_add=True) # Automatically set to the current date and time when the object is created.
-last_updated = models.DateTimeField(auto_now=True) # Automatically updated to the current date and time when the object is saved.
+2. auto_now_add vs auto_now
+`created_date = models.DateTimeField(auto_now_add=True) `
+- Automatically set to the current date and time when the object is created.
+`last_updated = models.DateTimeField(auto_now=True) `
+- Automatically updated to the current date and time when the object is saved. \
 
-3) By default, all fields in Django models are required unless explicitly specified otherwise. Since you haven't specified blank=True for these fields, they are already required.
+3. By default, all fields in Django models are required unless explicitly specified otherwise. Since you haven't specified **blank=True** for these fields, they are already required.
 
-4) Set Default Value:
-  is_active = models.BooleanField(default=True)
+4. **Set Default Value:**
+  ` is_active = models.BooleanField(default=True) `
   
-  
-5) email = models.EmailField(unique=True, max_length=30, error_messages={ 'unique': "Email already exists."})
+5. email = models.EmailField(unique=True, max_length=30, error_messages={ 'unique': "Email already exists."})
 The unique key in the error_messages dictionary specifies the error message to display when a unique constraint is violated.
 In this case, if a user tries to create a new user with an email that already exists in the database, Django will raise a validation error with the message "Email already exists."
 The error_messages dictionary provided in the EmailField definition in the Django model is specifically for handling the unique constraint validation error, not for handling the max_length constraint violation.
 
-6) BigAutoField vs SmallAutoField
+7) BigAutoField vs SmallAutoField
 -> BigAutoField is a 64-bit integer field
 -> SmallAutoField is a 32-bit integer field.
 -> The range of values that can be stored in a SmallAutoField is from -32768 to 32767.
 
-7) Default Table Name: 
+8) Default Table Name: 
 By default, Django uses the app name and the lowercase version of the model's class name as the table name (e.g., appname_modelname).
 
-8) class Meta:
+9) class Meta:
     managed = True
     db_table = 'tbl_login'
 

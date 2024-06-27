@@ -22,21 +22,19 @@
 - Check Process Id for a PORT:
 `sudo lsof -t -i:6379 -> Outputs Process ID`
 
-............................................................................................................................................................
-
 # Models:
 1. **BigAutoField vs BigIntegerField**
 - Use BigAutoField when you need an auto-incrementing primary key field for your model.
 - Use BigIntegerField when you need to store large integer values but don't need auto-incrementing behavior, or when you need to customize how values are assigned to the field.
-- When you define a field in a Django model as BigAutoField, Django automatically treats it as the primary key for the model. \
+- When you define a field in a Django model as BigAutoField, Django automatically treats it as the primary key for the model.  
 
 2. **auto_now_add vs auto_now** 
 - `created_date = models.DateTimeField(auto_now_add=True) ` Automatically set to the current date and time when the object is **created**.
-- `last_updated = models.DateTimeField(auto_now=True) ` Automatically updated to the current date and time when the object is **saved**. \
+- `last_updated = models.DateTimeField(auto_now=True) ` Automatically updated to the current date and time when the object is **saved**.  
 
-3. By default, all fields in Django models are required unless explicitly specified otherwise. Since you haven't specified **blank=True** for these fields, they are already required. \
+3. By default, all fields in Django models are required unless explicitly specified otherwise. Since you haven't specified **blank=True** for these fields, they are already required.  
 
-4. **Set Default Value:** ` is_active = models.BooleanField(default=True) ` \
+4. **Set Default Value:** ` is_active = models.BooleanField(default=True) `  
   
 5. `email = models.EmailField(unique=True, max_length=30, error_messages={ 'unique': "Email already exists."})`
 - The unique key in the **error_messages** dictionary specifies the error message to display when a unique constraint is violated.
